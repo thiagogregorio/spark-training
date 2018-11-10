@@ -1,7 +1,7 @@
 timestamps {
     node() {
         def userId = "par_04"
-        def mainClass = "com.thoughtworks.core.JobsExample"
+        def mainClass = "com.thoughtworks.exercises.batch.Persistence"
         def artifactBucket = "com.thoughtworks.training.de.recife/${userId}/bin"
 
         stage('Spark Exercises - Checkout') {
