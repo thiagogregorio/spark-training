@@ -25,41 +25,30 @@ object NeatTotal {
       .appName("Data Engineering Capability Development - ETL Exercises")
       .getOrCreate()
 
-    val dfOrdersRaw = spark.read
-      .option("delimiter", ";")
-      .option("header", true)
-      .option("infer_schema", true)
-      .csv(ordersBucket)
+    val orderItemsDF = spark.read
+        .option("delimiter", ";")
+        .option("header", true)
+        .option("infer_schema", true)
+        .csv(orderItemsBucket)
 
-    val dfOrderItemsRaw = spark.read
-      .option("delimiter", ";")
-      .option("header", true)
-      .option("infer_schema", true)
-      .csv(orderItemsBucket)
+    orderItemsDF.show(false)
 
-    val dfProductsRaw = spark.read
+    val productsDF = spark.read
       .option("delimiter", ";")
       .option("header", true)
       .option("infer_schema", true)
       .csv(productsBucket)
 
-    import org.apache.spark.sql.functions._
-    import spark.implicits._
+    productsDF.show(false)
 
-    val dfOrdersWithItems = dfOrdersRaw
-      .join(dfOrderItemsRaw, "OrderId")
-      .as("ooi")
-      .join(dfProductsRaw.as("p"), col("ooi.ProductId") === col("p.ProductId"))
+    val joinOrderItensWithProducts = orderItemsDF.join(productsDF, Seq("ProductId"))
 
-    val total = dfOrdersWithItems.agg(sum(($"p.Price" - $"ooi.Discount") * $"ooi.Quantity" ).as("total"))
-      .select("total").first().getAs[Double]("total")
+      joinOrderItensWithProducts.show(false)
 
-    val locale = new java.util.Locale("pt", "BR")
-    val formatter = java.text.NumberFormat.getCurrencyInstance(locale)
-    val totalFormatted = formatter.format(total)
+    joinOrderItensWithProducts.selectExpr("sum((Price-Discount)*Quantity) as Total").show(false)
 
-    log.info(s"O total de vendas foi $totalFormatted")
-    println(s"O total de vendas foi $totalFormatted")
+
+
     //185.670.050.745
     //cento e oitenta e cinco bilhões, seiscentos e setenta milhões, cinquenta mil e setecentos e quarenta e cinco
   }
