@@ -11,3 +11,7 @@ terraform/.terraform
 docker/
 *.csvdata/output/
 data/exercises/out/
+Jenkinsfile
+*.crc
+out/
+*/.terraform/
